@@ -347,6 +347,58 @@ const handler = async (m) => {
         case 'sprem': return legacy.run('sprem.mjs', 'sprem', m);
         case 'voice': return legacy.run('voice.mjs', 'voice', m);
         case 'toptv': return legacy.run('toptv.mjs', 'toptv', m);
+        case 'readviewonce':
+case 'rvo': {
+    if (!m.quoted) return replygcxeon(`Reply to view once message`)
+    if (m.quoted.mtype !== 'viewOnceMessageV2') return replygcxeon(`This is not a view once message`)
+    let msg = m.quoted.message
+    let type = Object.keys(msg)[0]
+    let media = await downloadContentFromMessage(msg[type], type == 'imageMessage' ? 'image' : 'video')
+    let buffer = Buffer.from([])
+    for await (const chunk of media) {
+        buffer = Buffer.concat([buffer, chunk])
+    }
+    if (/video/.test(type)) {
+        return XeonBotInc.sendFile(m.chat, buffer, 'media.mp4', msg[type].caption || '', m)
+    } else if (/image/.test(type)) {
+        return XeonBotInc.sendFile(m.chat, buffer, 'media.jpg', msg[type].caption || '', m)
+    }
+}
+break
+
+case "hitungwr": {
+    if (!text) return replygcxeon("Contoh *.hitungwr* 650 58 89")
+    let [tm, tw, mw] = text.split(" ")
+    if (isNaN(tm)) return replygcxeon("Masukan total Match")
+    if (isNaN(tw)) return replygcxeon("Masukan total Winrate")
+    if (isNaN(mw)) return replygcxeon("Masukan tujuan Winrate")
+    try {
+        const TotalMatch = parseFloat(tm)
+        const TotalWr = parseFloat(tw)
+        const MauWr = parseFloat(mw)
+
+        if (MauWr >= 100) {
+            return replygcxeon("Mana bisalahh 100% 😂")
+        }
+
+        function rumus(TotalMatch, TotalWr, MauWr) {
+            let tWin = TotalMatch * (TotalWr / 100)
+            let tLose = TotalMatch - tWin
+            let sisaWr = 100 - MauWr
+            let wrResult = 100 / sisaWr
+            let seratusPersen = tLose * wrResult
+            let final = seratusPersen - TotalMatch
+            return Math.round(final)
+        }
+
+        const resultNum = rumus(TotalMatch, TotalWr, MauWr)
+        const x = `Kamu memerlukan sekitar ${resultNum} win tanpa lose untuk mendapatkan win rate ${MauWr}%`
+        replygcxeon(x)
+    } catch (e) {
+        console.log(e)
+    }
+}
+break
     }
 };
 

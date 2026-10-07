@@ -72,6 +72,123 @@ const handler = async (m) => {
         case 'hapusjadwal': return legacy.run('grup-jadwal.mjs', 'hapusjadwal', m);
         case 'autosholat': return legacy.run('grup-autosholat.mjs', 'autosholat', m);
         case 'setkota': return legacy.run('grup-autosholat.mjs', 'setkota', m);
+   case 'kickall': {
+    if (!m.isGroup) return m.reply(mess.group || mess.only.group)
+    if (!isAdmins && !isCreator) return m.reply(mess.admin || 'Khusus Admin!!')
+    if (!isBotAdmins) return m.reply(mess.botAdmin || '_Bot Harus Menjadi Admin Terlebih Dahulu_')
+    const users = participants.map(a => a.id)
+    await conn.groupParticipantsUpdate(m.chat, users, 'remove')
+    await m.reply('Done')
+}
+break
+
+case 'kick': {
+    if (!m.isGroup) return m.reply(mess.group)
+    if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+    if (!isBotAdmins) return m.reply(mess.botAdmin)
+    let user = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+    if (!user || user === '@s.whatsapp.net') return m.reply('Tag, reply, atau masukkan nomor target!')
+    await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
+        .then((res) => m.reply(typeof json !== 'undefined' ? json(res) : mess.done || 'Berhasil!'))
+        .catch((err) => m.reply(typeof json !== 'undefined' ? json(err) : String(err)))
+}
+break
+
+case 'add': {
+    if (!m.isGroup) return m.reply(mess.group)
+    if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+    if (!isBotAdmins) return m.reply(mess.botAdmin)
+    let user = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+    if (!user || user === '@s.whatsapp.net') return m.reply('Reply pesan atau masukkan nomor target!')
+    await conn.groupParticipantsUpdate(m.chat, [user], 'add')
+        .then((res) => m.reply(typeof json !== 'undefined' ? json(res) : mess.done || 'Berhasil!'))
+        .catch((err) => m.reply(typeof json !== 'undefined' ? json(err) : String(err)))
+}
+break
+
+case 'promote': {
+    if (!m.isGroup) return m.reply(mess.group)
+    if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+    if (!isBotAdmins) return m.reply(mess.botAdmin)
+    let user = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+    if (!user || user === '@s.whatsapp.net') return m.reply('Tag, reply, atau masukkan nomor target!')
+    await conn.groupParticipantsUpdate(m.chat, [user], 'promote')
+        .then((res) => m.reply(typeof json !== 'undefined' ? json(res) : mess.done || 'Berhasil!'))
+        .catch((err) => m.reply(typeof json !== 'undefined' ? json(err) : String(err)))
+}
+break
+
+case 'demote': {
+    if (!m.isGroup) return m.reply(mess.group)
+    if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+    if (!isBotAdmins) return m.reply(mess.botAdmin)
+    let user = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+    if (!user || user === '@s.whatsapp.net') return m.reply('Tag, reply, atau masukkan nomor target!')
+    await conn.groupParticipantsUpdate(m.chat, [user], 'demote')
+        .then((res) => m.reply(typeof json !== 'undefined' ? json(res) : mess.done || 'Berhasil!'))
+        .catch((err) => m.reply(typeof json !== 'undefined' ? json(err) : String(err)))
+}
+break
+
+case 'setname':
+case 'setsubject': {
+    if (!m.isGroup) return m.reply(mess.group)
+    if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+    if (!isBotAdmins) return m.reply(mess.botAdmin)
+    if (!text) return m.reply('Masukkan teks nama grup!')
+    await conn.groupUpdateSubject(m.chat, text)
+        .then((res) => m.reply(mess.success || mess.done || 'Berhasil mengubah nama grup!'))
+        .catch((err) => m.reply(typeof json !== 'undefined' ? json(err) : String(err)))
+}
+break
+
+case 'setdesc':
+case 'setdesk': {
+    if (!m.isGroup) return m.reply(mess.group)
+    if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+    if (!isBotAdmins) return m.reply(mess.botAdmin)
+    if (!text) return m.reply('Masukkan teks deskripsi grup!')
+    await conn.groupUpdateDescription(m.chat, text)
+        .then((res) => m.reply(mess.success || mess.done || 'Berhasil mengubah deskripsi grup!'))
+        .catch((err) => m.reply(typeof json !== 'undefined' ? json(err) : String(err)))
+}
+break
+
+case 'setppgroup':
+case 'setppgrup':
+case 'setppgc': {
+    if (!m.isGroup) return m.reply(mess.group)
+    if (!isAdmins) return m.reply(mess.admin)
+    if (!isBotAdmins) return m.reply(mess.botAdmin)
+    if (!quoted) return m.reply(`Kirim/Reply Gambar Dengan Caption ${prefix + command}`)
+    if (!/image/.test(mime)) return m.reply(`Kirim/Reply Gambar Dengan Caption ${prefix + command}`)
+    if (/webp/.test(mime)) return m.reply(`Kirim/Reply Gambar Dengan Caption ${prefix + command}`)
+
+    let medis = await conn.downloadAndSaveMediaMessage(quoted, 'ppbot.jpeg')
+    if (args[0] === 'full') {
+        let { img } = await generateProfilePicture(medis)
+        await conn.query({
+            tag: 'iq',
+            attrs: {
+                to: m.chat,
+                type: 'set',
+                xmlns: 'w:profile:picture'
+            },
+            content: [{
+                tag: 'picture',
+                attrs: { type: 'image' },
+                content: img
+            }]
+        })
+        if (fs.existsSync(medis)) fs.unlinkSync(medis)
+        m.reply(mess.done || mess.success || 'Berhasil!')
+    } else {
+        await conn.updateProfilePicture(m.chat, { url: medis })
+        if (fs.existsSync(medis)) fs.unlinkSync(medis)
+        m.reply(mess.done || mess.success || 'Berhasil!')
+    }
+}
+break
     }
 };
 
