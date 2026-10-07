@@ -1,0 +1,37 @@
+{
+  "name": "ichigo-md-v3",
+  "version": "1.0.0",
+  "description": "ICHIGO V3 - WhatsApp bot by renxtech (Node.js & Baileys)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "postinstall": "sed -i '/console.info.*Closing session/d' node_modules/libsignal/src/session_record.js 2>/dev/null || true"
+  },
+  "dependencies": {
+    "@hanzofc/baileys": "latest",
+    "@hapi/boom": "^10.0.1",
+    "@napi-rs/canvas": "^0.1.53",
+    "adm-zip": "^0.5.16",
+    "axios": "^1.7.2",
+    "chalk": "^4.1.2",
+    "cheerio": "^1.0.0",
+    "chokidar": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "figlet": "^1.7.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "form-data": "^4.0.0",
+    "javascript-obfuscator": "^4.1.0",
+    "mime-types": "^2.1.35",
+    "pino": "^9.0.0",
+    "sharp": "^0.33.5",
+    "spinnies": "^0.5.1",
+    "ssh2": "^1.15.0",
+    "yt-search": "latest",
+    "ytmusic-api": "latest"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT"
+}
